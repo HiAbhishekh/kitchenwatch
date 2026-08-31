@@ -1,0 +1,12 @@
+{
+  "kind": "cook",
+  "title": "Chicken curry with the milk",
+  "window_start": "2026-08-29T18:00:00",
+  "window_end": "2026-08-29T19:00:00",
+  "reason_item_id": "milk",
+  "notes": "Plan invented chicken. Ledger does not have it.",
+  "uses": [
+    { "item_id": "milk", "qty": 1, "unit": "count" },
+    { "item_id": "chicken", "qty": 300, "unit": "g" }
+  ]
+}

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="640" viewBox="0 0 1100 640" role="img" aria-labelledby="title desc">
+  <title id="title">KitchenWatch architecture</title>
+  <desc id="desc">Ingest path uses Gemini 3.5 to extract fridge items into Firestore. Watch path is retrieve, plan, Python trust, Calendar insert, then verify. Cloud Scheduler wakes watch at 07:00.</desc>
+  <rect width="1100" height="640" fill="#14110e"/>
+  <text x="40" y="48" fill="#f3eadc" font-family="Georgia, serif" font-size="28">KitchenWatch</text>
+  <text x="40" y="76" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Won't put dinner on your calendar that your fridge cannot feed.</text>
+
+  <rect x="40" y="110" width="480" height="460" fill="#1c1814" stroke="#2c261f"/>
+  <text x="60" y="142" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" letter-spacing="2">INGEST (user present)</text>
+  <text x="60" y="184" fill="#f3eadc" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">Camera or voice</text>
+  <text x="60" y="228" fill="#c45c26" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">Gemini 3.5 Flash extract</text>
+  <text x="60" y="252" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">Google GenAI SDK · Vertex global</text>
+  <text x="60" y="296" fill="#f3eadc" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">accept_extract</text>
+  <text x="60" y="320" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">confidence ≥ 0.7 · known units only</text>
+  <text x="60" y="364" fill="#f3eadc" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">Firestore ledger</text>
+  <text x="60" y="388" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">kitchens/demo/items/{item_id}</text>
+  <text x="60" y="450" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">Weak guesses never enter the shelf.</text>
+
+  <rect x="580" y="110" width="480" height="460" fill="#1c1814" stroke="#2c261f"/>
+  <text x="600" y="142" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" letter-spacing="2">WATCH (unattended)</text>
+  <text x="600" y="184" fill="#f3eadc" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">Cloud Scheduler 07:00 IST · OIDC</text>
+  <text x="600" y="228" fill="#f3eadc" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">1 Retrieve — Firestore, 48h expiry</text>
+  <text x="600" y="268" fill="#c45c26" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">2 Plan — Gemini, one cook</text>
+  <text x="600" y="308" fill="#6f8f5c" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">3 Trust — Python, not an LLM</text>
+  <text x="600" y="348" fill="#f3eadc" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">4 Write — Calendar.insert</text>
+  <text x="600" y="388" fill="#f3eadc" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16">5 Verify — Calendar.get</text>
+  <text x="600" y="432" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">job_id = watch:{kitchen}:{YYYY-MM-DD}</text>
+  <text x="600" y="456" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">Same day does not insert twice.</text>
+  <text x="600" y="500" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">Trust fail or write fail: no event.</text>
+
+  <text x="40" y="610" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">Cloud Run · Firestore · Cloud Scheduler · Google Calendar · GCP project truemerge (reused cloud project, not leftover product code)</text>
+</svg>

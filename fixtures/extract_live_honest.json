@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "name": "whole milk",
+      "qty": 1.0,
+      "unit": "carton",
+      "expiry": "2026-08-30",
+      "confidence": 1.0
+    },
+    {
+      "name": "eggs",
+      "qty": 6.0,
+      "unit": "count",
+      "expiry": "2026-09-04",
+      "confidence": 1.0
+    },
+    {
+      "name": "baby spinach",
+      "qty": 200.0,
+      "unit": "g",
+      "expiry": "2026-08-31",
+      "confidence": 1.0
+    }
+  ]
+}

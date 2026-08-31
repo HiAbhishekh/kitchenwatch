@@ -1,0 +1,13 @@
+{
+  "kind": "cook",
+  "title": "Use the milk — spinach omelette",
+  "window_start": "2026-08-29T18:00:00",
+  "window_end": "2026-08-29T19:00:00",
+  "reason_item_id": "whole milk",
+  "notes": "Milk expires tomorrow.",
+  "uses": [
+    { "item_id": "milk", "qty": 1, "unit": "count" },
+    { "item_id": "eggs", "qty": 2, "unit": "count" },
+    { "item_id": "baby spinach", "qty": 80, "unit": "g" }
+  ]
+}

@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KitchenWatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c0b09;
+      --surface: #161412;
+      --surface-2: #1e1b17;
+      --surface-3: #252119;
+      --ink: #f4efe6;
+      --muted: #9b9084;
+      --line: #2f2a24;
+      --accent: #e07840;
+      --accent-soft: rgba(224, 120, 64, 0.14);
+      --warn: #f0b060;
+      --ok: #7fad6e;
+      --bad: #d46555;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--ink); }
+    body {
+      font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 20px 24px 48px;
+    }
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 8px 0 28px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 28px;
+    }
+    .brand h1 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: 32px;
+      font-weight: 400;
+      margin: 0;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .brand p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 420px;
+    }
+    .topbar-meta {
+      text-align: right;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .topbar-meta strong { color: var(--warn); font-weight: 600; }
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .panel-head {
+      margin-bottom: 20px;
+    }
+    .step-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 6px;
+    }
+    .panel-title {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: 22px;
+      font-weight: 400;
+      margin: 0 0 6px;
+      line-height: 1.2;
+    }
+    .panel-desc {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .capture {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    video, img.preview {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+    [hidden] { display: none !important; }
+    .capture .hint {
+      color: var(--muted);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 14px;
+      max-width: 280px;
+      line-height: 1.5;
+    }
+    .toolbar {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .toolbar-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      min-width: 52px;
+    }
+    button, label.btn {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--line);
+      background: var(--surface-3);
+      color: var(--ink);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    button:hover, label.btn:hover {
+      border-color: #4a4034;
+      background: #2c261f;
+    }
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    button.primary:hover { background: #d06d38; border-color: #d06d38; }
+    button.recording {
+      background: var(--bad);
+      border-color: var(--bad);
+      color: #fff;
+    }
+    button.ghost-danger {
+      color: #f0b8ae;
+      border-color: #4a3028;
+      background: transparent;
+    }
+    button.ghost-danger:hover {
+      border-color: var(--bad);
+      background: rgba(212, 101, 85, 0.12);
+    }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    input[type="file"] { display: none; }
+    input[type="date"] {
+      background: var(--surface-3);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font: inherit;
+      font-size: 13px;
+      color-scheme: dark;
+    }
+    .status-bar {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      border: 1px solid rgba(224, 120, 64, 0.25);
+      color: var(--warn);
+      font-size: 14px;
+      font-weight: 500;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+    .status-bar:empty { display: none; }
+    .shelf-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 24px 0 12px;
+      gap: 12px;
+    }
+    .shelf-head h4 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .shelf-count {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .shelf-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .shelf-empty {
+      padding: 28px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+    }
+    .shelf-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px 16px;
+      padding: 14px 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      align-items: center;
+    }
+    .shelf-card.soon-card {
+      border-color: rgba(240, 176, 96, 0.35);
+      background: rgba(240, 176, 96, 0.06);
+    }
+    .shelf-card-main { min-width: 0; }
+    .shelf-name {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 4px;
+      line-height: 1.3;
+    }
+    .shelf-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border: 1px solid var(--line);
+      background: var(--surface-3);
+    }
+    .badge-voice { color: #c9b8a8; }
+    .badge-manual { color: #8eb8d4; border-color: #3a4550; }
+    .badge-fixture { color: #a8b88e; border-color: #3a4530; }
+    .badge-photo { color: #b8a8d4; }
+    .shelf-qty {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .shelf-expiry {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding-top: 4px;
+      border-top: 1px solid var(--line);
+      margin-top: 2px;
+    }
+    .expiry-text {
+      font-size: 13px;
+      color: var(--muted);
+      flex: 1;
+      min-width: 120px;
+    }
+    .expiry-text.soon { color: var(--warn); font-weight: 600; }
+    .expiry-text.missing { color: var(--bad); font-weight: 600; }
+    .shelf-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .shelf-actions input[type="date"] {
+      padding: 8px 10px;
+      min-width: 140px;
+    }
+    .shelf-actions button {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+    .watch-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .result {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      min-height: 140px;
+    }
+    .result-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid var(--line);
+      margin-bottom: 12px;
+      color: var(--muted);
+    }
+    .result-status.status-written { color: var(--ok); border-color: rgba(127, 173, 110, 0.4); background: rgba(127, 173, 110, 0.08); }
+    .result-status.status-write_fail,
+    .result-status.status-trust_fail,
+    .result-status.status-verify_fail { color: var(--bad); border-color: rgba(212, 101, 85, 0.4); background: rgba(212, 101, 85, 0.08); }
+    .result-title {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: 26px;
+      font-weight: 400;
+      line-height: 1.15;
+      margin: 0 0 10px;
+    }
+    .result-detail {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      color: #7a7268;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+    .pipeline {
+      display: flex;
+      gap: 6px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .pipe-step {
+      flex: 1;
+      min-width: 88px;
+      padding: 10px 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+    }
+    .pipe-step b {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .pipe-step span {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .footnote {
+      margin-top: 16px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      line-height: 1.5;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; }
+      .topbar-meta { text-align: left; }
+      .shelf-card { grid-template-columns: 1fr; }
+      .shelf-qty { text-align: left; }
+      .pipeline { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <h1>KitchenWatch</h1>
+        <p>Won't put dinner on your calendar that your fridge cannot feed.</p>
+      </div>
+      <div class="topbar-meta">
+        <strong>Taskmaster</strong> · Gemini 3.5 · Cloud Run<br />
+        Scheduler wakes at <strong>07:00 IST</strong>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-head">
+          <p class="step-label">Step 1</p>
+          <h2 class="panel-title">What's on the shelf?</h2>
+          <p class="panel-desc">Photo, voice, or demo reset. Fix unknown dates before watch runs.</p>
+        </div>
+
+        <div class="capture">
+          <div class="hint" id="hint">Point at the fridge, upload a photo, or record what you have.</div>
+          <video id="cam" autoplay playsinline muted hidden></video>
+          <img id="shot" class="preview" alt="" hidden />
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar-row">
+            <span class="toolbar-label">Photo</span>
+            <button type="button" id="live">Camera</button>
+            <button type="button" id="snap" class="primary" disabled>Capture</button>
+            <label class="btn" for="file">Upload</label>
+            <input id="file" type="file" accept="image/*" capture="environment" />
+          </div>
+          <div class="toolbar-row">
+            <span class="toolbar-label">Voice</span>
+            <button type="button" id="mic">Record</button>
+            <label class="btn" for="voicefile">Upload audio</label>
+            <input id="voicefile" type="file" accept="audio/*" />
+          </div>
+        </div>
+
+        <div class="status-bar" id="note" role="status"></div>
+
+        <div class="shelf-head">
+          <h4>Your shelf</h4>
+          <span class="shelf-count" id="shelf-count"></span>
+        </div>
+        <div class="shelf-list" id="shelf"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <p class="step-label">Step 2</p>
+          <h2 class="panel-title">Run the watch</h2>
+          <p class="panel-desc">One verified cook event on Google Calendar — only if Trust passes.</p>
+        </div>
+
+        <div class="watch-controls">
+          <input type="date" id="asof" aria-label="Watch date" />
+          <button type="button" id="run" class="primary">Run watch</button>
+          <button type="button" id="seed">Reset demo shelf</button>
+        </div>
+
+        <div class="result" id="job">
+          <span class="result-status">Waiting</span>
+          <h3 class="result-title">No calendar event yet</h3>
+          <p class="result-detail">Add dated food, then run watch.</p>
+        </div>
+
+        <div class="pipeline">
+          <div class="pipe-step"><b>Retrieve</b><span>Firestore shelf</span></div>
+          <div class="pipe-step"><b>Plan</b><span>Gemini cook</span></div>
+          <div class="pipe-step"><b>Trust</b><span>Python rules</span></div>
+          <div class="pipe-step"><b>Write</b><span>Calendar</span></div>
+          <div class="pipe-step"><b>Verify</b><span>GET event</span></div>
+        </div>
+
+        <p class="footnote">
+          Same day won't write twice — skipped_idempotent keeps Calendar clean.
+        </p>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const kitchen = "demo";
+    let blob = null;
+    let stream = null;
+    let recorder = null;
+    let chunks = [];
+    let recTimer = null;
+    let recSeconds = 0;
+
+    function todayISO() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return y + "-" + m + "-" + day;
+    }
+    $("asof").value = todayISO();
+
+    function say(text) {
+      const el = $("note");
+      el.textContent = text || "";
+    }
+
+    function esc(value) {
+      return String(value == null ? "" : value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function badgeClass(source) {
+      if (source === "voice") return "badge-voice";
+      if (source === "manual") return "badge-manual";
+      if (source === "fixture") return "badge-fixture";
+      return "badge-photo";
+    }
+
+    function daysUntil(expiry, asof) {
+      const oneDay = 24 * 60 * 60 * 1000;
+      const end = new Date(expiry + "T00:00:00");
+      const start = new Date(asof + "T00:00:00");
+      return Math.round((end - start) / oneDay);
+    }
+
+    function expiryLabel(expiry, asof) {
+      if (!expiry) return { text: "No expiry set", class: "missing" };
+      const days = daysUntil(expiry, asof);
+      if (days < 0) return { text: expiry + " — expired", class: "missing" };
+      if (days === 0) return { text: expiry + " — use today", class: "soon" };
+      if (days === 1) return { text: expiry + " — tomorrow", class: "soon" };
+      if (days <= 2) return { text: expiry + " — in " + days + " days", class: "soon" };
+      return { text: expiry, class: "" };
+    }
+
+    function addDays(iso, n) {
+      const d = new Date(iso + "T00:00:00");
+      d.setDate(d.getDate() + n);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function renderShelf(items) {
+      const list = $("shelf");
+      const count = $("shelf-count");
+      list.innerHTML = "";
+      count.textContent = items.length ? items.length + " item" + (items.length === 1 ? "" : "s") : "";
+
+      if (!items.length) {
+        list.innerHTML = "<div class=\"shelf-empty\">Empty shelf. Capture the fridge, record voice, or reset demo.</div>";
+        return;
+      }
+
+      const asof = $("asof").value;
+      for (const item of items) {
+        const soon = item.expiry && item.expiry <= addDays(asof, 2);
+        const exp = expiryLabel(item.expiry, asof);
+        const card = document.createElement("div");
+        card.className = "shelf-card" + (soon ? " soon-card" : "");
+        card.innerHTML = `
+          <div class="shelf-card-main">
+            <p class="shelf-name">${esc(item.name)}</p>
+            <div class="shelf-meta">
+              <span class="badge ${badgeClass(item.source)}">${esc(item.source)}</span>
+              <span>${esc(item.item_id)}</span>
+            </div>
+          </div>
+          <div class="shelf-qty">${esc(item.qty)} ${esc(item.unit)}</div>
+          <div class="shelf-expiry">
+            <span class="expiry-text ${exp.class}">${esc(exp.text)}</span>
+            <div class="shelf-actions">
+              <input type="date" value="${esc(item.expiry || "")}" aria-label="Expiry for ${esc(item.name)}" />
+              <button type="button" class="save-expiry">Save date</button>
+              <button type="button" class="ghost-danger delete-item">Remove</button>
+            </div>
+          </div>
+        `;
+        card.querySelector(".save-expiry").onclick = () => {
+          saveExpiry(item.item_id, card.querySelector("input[type=date]").value);
+        };
+        card.querySelector(".delete-item").onclick = () => deleteItem(item.item_id, item.name);
+        list.appendChild(card);
+      }
+    }
+
+    async function saveExpiry(itemId, expiry) {
+      const data = new FormData();
+      data.append("expiry", expiry);
+      const res = await fetch("/kitchens/" + kitchen + "/items/" + encodeURIComponent(itemId) + "/expiry", {
+        method: "POST",
+        body: data,
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        say(body.detail || "Could not save expiry.");
+        return;
+      }
+      renderShelf(body.items || []);
+      say(expiry ? "Saved expiry for " + itemId + "." : "Expiry cleared for " + itemId + ".");
+    }
+
+    async function deleteItem(itemId, name) {
+      if (!confirm("Remove " + name + " from the shelf?")) return;
+      const res = await fetch("/kitchens/" + kitchen + "/items/" + encodeURIComponent(itemId), {
+        method: "DELETE",
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        say(body.detail || "Could not remove item.");
+        return;
+      }
+      renderShelf(body.items || []);
+      say("Removed " + name + ".");
+    }
+
+    function renderJob(job) {
+      if (!job) return;
+      const title = (job.proposed && job.proposed.title) || job.status;
+      const uses = job.proposed && job.proposed.uses
+        ? job.proposed.uses.map((need) => need.item_id + " " + need.qty + need.unit).join(", ")
+        : "";
+      const notes = job.proposed && job.proposed.notes ? esc(job.proposed.notes) : "";
+      $("job").innerHTML = `
+        <span class="result-status status-${esc(job.status)}">${esc(job.status.replaceAll("_", " "))}</span>
+        <h3 class="result-title">${esc(title)}</h3>
+        ${uses ? `<p class="result-detail">Uses: ${esc(uses)}</p>` : ""}
+        ${notes ? `<p class="result-detail">${notes}</p>` : ""}
+        <div class="mono">${esc(job.job_id)}${job.calendar_event_id ? " · " + esc(job.calendar_event_id) : ""}</div>
+        ${job.error ? `<div class="mono">${esc(job.error)}</div>` : ""}
+        ${job.trust && job.trust.reasons && job.trust.reasons.length
+          ? `<div class="mono">${esc(job.trust.reasons.join(" · "))}</div>` : ""}
+      `;
+    }
+
+    async function refresh() {
+      const items = await fetch("/kitchens/" + kitchen + "/items").then((r) => r.json());
+      renderShelf(items.items || []);
+      const jobs = await fetch("/kitchens/" + kitchen + "/jobs").then((r) => r.json());
+      const list = jobs.jobs || [];
+      if (list.length) renderJob(list[list.length - 1]);
+    }
+
+    async function ingestBlob(file) {
+      say("Reading the shelf…");
+      const data = new FormData();
+      data.append("photo", file, file.name || "fridge.jpg");
+      data.append("kitchen_id", kitchen);
+      const res = await fetch("/ingest", { method: "POST", body: data });
+      const body = await res.json();
+      if (!res.ok) { say(body.detail || "Ingest failed"); return; }
+      renderShelf(body.shelf || []);
+      const dropped = (body.dropped || []).join(" · ");
+      say((body.accepted || []).length + " on shelf" + (dropped ? ". Dropped: " + dropped : "."));
+    }
+
+    $("live").onclick = async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      } catch (err) {
+        say("Camera blocked — allow it in the address bar, or upload a photo.");
+        return;
+      }
+      $("cam").srcObject = stream;
+      $("cam").hidden = false;
+      $("shot").hidden = true;
+      $("hint").hidden = true;
+      $("snap").disabled = false;
+    };
+
+    $("snap").onclick = () => {
+      const video = $("cam");
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      canvas.getContext("2d").drawImage(video, 0, 0);
+      canvas.toBlob(async (next) => {
+        blob = next;
+        $("shot").src = URL.createObjectURL(next);
+        $("shot").hidden = false;
+        $("cam").hidden = true;
+        $("hint").hidden = true;
+        if (stream) stream.getTracks().forEach((t) => t.stop());
+        await ingestBlob(new File([next], "capture.jpg", { type: "image/jpeg" }));
+      }, "image/jpeg", 0.92);
+    };
+
+    async function ingestVoice(file) {
+      say("Sending to Gemini…");
+      const data = new FormData();
+      data.append("audio", file, file.name || "shelf.webm");
+      data.append("kitchen_id", kitchen);
+      try {
+        const res = await fetch("/ingest-voice", { method: "POST", body: data });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const detail = body.detail;
+          say(typeof detail === "string" ? detail : "Voice ingest failed");
+          return;
+        }
+        renderShelf(body.shelf || []);
+        const dropped = (body.dropped || []).join(" · ");
+        say((body.accepted || []).length + " from voice" + (dropped ? ". Dropped: " + dropped : "."));
+      } catch (err) {
+        say("Voice failed: " + (err && err.message ? err.message : err));
+      }
+    }
+
+    function pickRecorder(stream) {
+      const types = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/aac", "audio/ogg;codecs=opus"];
+      for (const mime of types) {
+        if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(mime)) {
+          try { return new MediaRecorder(stream, { mimeType: mime }); } catch (_e) {}
+        }
+      }
+      return new MediaRecorder(stream);
+    }
+
+    function stopVoice() {
+      if (recTimer) { clearInterval(recTimer); recTimer = null; }
+      if (recorder && recorder.state === "recording") recorder.stop();
+    }
+
+    $("mic").onclick = async () => {
+      try {
+        if (recorder && recorder.state === "recording") { stopVoice(); return; }
+        if (!navigator.mediaDevices?.getUserMedia) {
+          say("No mic API — upload audio instead.");
+          return;
+        }
+        if (typeof MediaRecorder === "undefined") {
+          say("Can't record here — upload audio instead.");
+          return;
+        }
+        say("Allow mic, then say items and dates.");
+        const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+        chunks = [];
+        recorder = pickRecorder(mic);
+        recorder.ondataavailable = (ev) => { if (ev.data?.size) chunks.push(ev.data); };
+        recorder.onerror = () => say("Recorder failed — upload audio instead.");
+        recorder.onstop = async () => {
+          if (recTimer) { clearInterval(recTimer); recTimer = null; }
+          mic.getTracks().forEach((t) => t.stop());
+          $("mic").textContent = "Record";
+          $("mic").classList.remove("recording");
+          const type = recorder.mimeType || chunks[0]?.type || "audio/webm";
+          const ext = /mp4|m4a|aac/i.test(type) ? "m4a" : /ogg/i.test(type) ? "ogg" : "webm";
+          const file = new File(chunks, "shelf." + ext, { type: type.split(";")[0] });
+          if (!file.size) {
+            say("No audio captured. Record again or upload audio.");
+            return;
+          }
+          await ingestVoice(file);
+        };
+        recorder.start(250);
+        $("mic").textContent = "Stop";
+        $("mic").classList.add("recording");
+        recSeconds = 0;
+        say("Recording… tap Stop when done (auto-stops at 12s).");
+        recTimer = setInterval(() => {
+          recSeconds += 1;
+          say("Recording " + recSeconds + "s…");
+          if (recSeconds >= 12) stopVoice();
+        }, 1000);
+      } catch (err) {
+        const name = err?.name;
+        if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+          say("Mic blocked — allow in address bar, or upload audio.");
+        } else if (name === "NotFoundError") {
+          say("No microphone found.");
+        } else {
+          say("Voice failed — upload audio instead.");
+        }
+      }
+    };
+
+    $("voicefile").onchange = async (ev) => {
+      const file = ev.target.files[0];
+      if (file) await ingestVoice(file);
+    };
+
+    $("file").onchange = async (ev) => {
+      const file = ev.target.files[0];
+      if (!file) return;
+      $("shot").src = URL.createObjectURL(file);
+      $("shot").hidden = false;
+      $("cam").hidden = true;
+      $("hint").hidden = true;
+      await ingestBlob(file);
+    };
+
+    $("seed").onclick = async () => {
+      const data = new FormData();
+      data.append("kitchen_id", kitchen);
+      const res = await fetch("/demo/seed", { method: "POST", body: data });
+      const body = await res.json();
+      if (!res.ok) { say(body.detail || "Seed failed"); return; }
+      renderShelf(body.items || []);
+      say("Demo shelf reset. Milk expires tomorrow.");
+    };
+
+    $("run").onclick = async () => {
+      $("run").disabled = true;
+      say("Watch running…");
+      const data = new FormData();
+      data.append("kitchen_id", kitchen);
+      data.append("as_of", $("asof").value);
+      const res = await fetch("/watch", { method: "POST", body: data });
+      const job = await res.json();
+      $("run").disabled = false;
+      if (!res.ok) { say(job.detail || "Watch failed"); return; }
+      renderJob(job);
+      say(job.status === "written" ? "Calendar has the event." : job.status.replaceAll("_", " ") + ".");
+    };
+
+    refresh().catch((err) => say(String(err)));
+  </script>
+</body>
+</html>

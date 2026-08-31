@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "name": "milk",
+      "qty": 1,
+      "unit": "count",
+      "expiry": "2026-08-30",
+      "confidence": 0.9
+    },
+    {
+      "name": "maybe chicken",
+      "qty": 1,
+      "unit": "pack",
+      "expiry": null,
+      "confidence": 0.41
+    },
+    {
+      "name": "mystery sauce",
+      "qty": 1,
+      "unit": "sachet",
+      "expiry": null,
+      "confidence": 0.85
+    }
+  ]
+}

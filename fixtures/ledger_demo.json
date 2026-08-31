@@ -1,0 +1,46 @@
+{
+  "kitchen_id": "demo",
+  "as_of": "2026-08-29",
+  "items": [
+    {
+      "item_id": "milk",
+      "name": "Milk",
+      "qty": 1,
+      "unit": "count",
+      "expiry": "2026-08-30",
+      "source": "fixture",
+      "confidence": 0.95,
+      "kitchen_id": "demo"
+    },
+    {
+      "item_id": "eggs",
+      "name": "Eggs",
+      "qty": 6,
+      "unit": "count",
+      "expiry": "2026-09-04",
+      "source": "fixture",
+      "confidence": 0.93,
+      "kitchen_id": "demo"
+    },
+    {
+      "item_id": "spinach",
+      "name": "Spinach",
+      "qty": 200,
+      "unit": "g",
+      "expiry": "2026-08-31",
+      "source": "fixture",
+      "confidence": 0.9,
+      "kitchen_id": "demo"
+    },
+    {
+      "item_id": "onion",
+      "name": "Onion",
+      "qty": 2,
+      "unit": "count",
+      "expiry": null,
+      "source": "fixture",
+      "confidence": 0.88,
+      "kitchen_id": "demo"
+    }
+  ]
+}
