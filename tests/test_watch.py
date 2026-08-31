@@ -151,11 +151,26 @@ def test_post_watch_endpoint():
 
 
 def test_demo_seed_plants_tomorrow_milk():
-    client = TestClient(create_app(store=MemoryLedger(), jobs=MemoryJobStore(), calendar=MemoryCalendar()))
+    store = MemoryLedger()
+    store.upsert(
+        [
+            InventoryItem(
+                item_id="old_voice_item",
+                name="old voice item",
+                qty=1,
+                unit="count",
+                expiry=None,
+                source="voice",
+                confidence=0.9,
+            )
+        ]
+    )
+    client = TestClient(create_app(store=store, jobs=MemoryJobStore(), calendar=MemoryCalendar()))
     response = client.post("/demo/seed", data={"kitchen_id": "demo"})
     assert response.status_code == 200
     ids = {row["item_id"] for row in response.json()["items"]}
     assert ids == {"milk", "spinach", "eggs"}
+    assert all(row["source"] == "fixture" for row in response.json()["items"])
 
 
 def test_manual_expiry_edit_and_delete_item():

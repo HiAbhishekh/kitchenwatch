@@ -231,6 +231,8 @@ def create_app(
         kitchen_id: str = Form("demo"),
         ledger: Ledger = Depends(get_store),
     ):
+        for item in ledger.list_items(kitchen_id):
+            ledger.delete(kitchen_id, item.item_id)
         items = plant_demo_kitchen(kitchen_id=kitchen_id)
         ledger.upsert(items)
         return {

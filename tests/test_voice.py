@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -94,6 +95,17 @@ def test_audio_suffix_from_safari_and_chrome_types():
     assert audio_suffix("blob", "audio/mp4") == ".m4a"
     assert audio_suffix("memo.weba", None) == ".webm"
     assert audio_suffix("notes.txt", "text/plain") is None
+
+
+def test_voice_prompt_resolves_relative_dates_for_grouped_items():
+    from kitchenwatch.voice import voice_prompt
+
+    prompt = voice_prompt(date(2026, 8, 31))
+
+    assert "Today is 2026-08-31" in prompt
+    assert '"tomorrow" = 2026-09-01' in prompt
+    assert '"after 2 days" / "in 2 days" / "two days from today" = 2026-09-02' in prompt
+    assert "lady finger and cucumber have expiry 2026-09-02" in prompt
 
 
 def test_post_ingest_voice_surfaces_extract_error(tmp_path: Path):

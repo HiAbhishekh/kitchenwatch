@@ -442,11 +442,11 @@
         <div class="panel-head">
           <p class="step-label">Step 1</p>
           <h2 class="panel-title">What's on the shelf?</h2>
-          <p class="panel-desc">Photo, voice, or demo reset. Fix unknown dates before watch runs.</p>
+          <p class="panel-desc">Photo, voice, or demo reset. Say dates like “expires tomorrow” or “both expire in two days.”</p>
         </div>
 
         <div class="capture">
-          <div class="hint" id="hint">Point at the fridge, upload a photo, or record what you have.</div>
+          <div class="hint" id="hint">Point at the fridge, upload a photo, or say: “cucumber and lady finger expire in two days.”</div>
           <video id="cam" autoplay playsinline muted hidden></video>
           <img id="shot" class="preview" alt="" hidden />
         </div>
@@ -764,7 +764,7 @@
           say("Can't record here — upload audio instead.");
           return;
         }
-        say("Allow mic, then say items and dates.");
+        say("Allow mic, then say: cucumber and lady finger expire in two days.");
         const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
         chunks = [];
         recorder = pickRecorder(mic);

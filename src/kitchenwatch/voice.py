@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import mimetypes
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -53,7 +54,11 @@ def audio_suffix(filename: str | None, content_type: str | None = None) -> str |
     return None
 
 
-VOICE_PROMPT = """You extract a kitchen inventory from ONE spoken dump.
+def voice_prompt(as_of: date | None = None) -> str:
+    day = as_of or date.today()
+    tomorrow = day + timedelta(days=1)
+    two_days = day + timedelta(days=2)
+    return f"""You extract a kitchen inventory from ONE spoken dump.
 
 Rules:
 - Only list food the speaker actually named. Do not invent items.
@@ -62,6 +67,10 @@ Rules:
 - qty: a positive number.
 - unit: one of count, carton, bottle, pack, bunch, g, kg, ml, l.
 - expiry: ISO date YYYY-MM-DD if a date was spoken, else null.
+- Today is {day.isoformat()}.
+- Convert relative dates using Today. "tomorrow" = {tomorrow.isoformat()}; "after 2 days" / "in 2 days" / "two days from today" = {two_days.isoformat()}.
+- If the speaker names several items and then says "both expire...", "they expire...", or "these expire...", apply that expiry to every item in that phrase.
+- Example: "lady finger and cucumber expire after 2 days" means both lady finger and cucumber have expiry {two_days.isoformat()}.
 - confidence: 0 to 1. If you are guessing, use below 0.7.
 
 Return JSON only.
@@ -101,7 +110,7 @@ def vertex_audio_caller() -> GeminiCaller:
         response = client.models.generate_content(
             model=model,
             contents=[
-                VOICE_PROMPT,
+                voice_prompt(),
                 types.Part.from_bytes(
                     data=path.read_bytes(), mime_type=_audio_mime(path)
                 ),
