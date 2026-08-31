@@ -28,5 +28,5 @@
   <text x="600" y="456" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">Same day does not insert twice.</text>
   <text x="600" y="500" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">Trust fail or write fail: no event.</text>
 
-  <text x="40" y="610" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">Cloud Run · Firestore · Cloud Scheduler · Google Calendar · GCP project truemerge (reused cloud project, not leftover product code)</text>
+  <text x="40" y="610" fill="#9a8f80" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12">Cloud Run · Firestore · Cloud Scheduler · Secret Manager · Google Calendar API · Gemini 3.5 Flash</text>
 </svg>

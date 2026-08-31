@@ -1,93 +1,93 @@
-# Google Cloud — what you do vs what I do
+# Google Cloud setup
 
-Account already on this machine: `123abhishekwasekar@gmail.com`  
-Billing already open: `017820-F833DF-A6BB7E` (My Billing Account)
+KitchenWatch runs as a small Cloud Run service with Firestore state, Secret Manager configuration, Cloud Scheduler, Vertex AI, and Google Calendar API.
 
-We could not create a new project: id `kitchenwatch` is taken globally, and this account is at **project quota**. We are running KitchenWatch on the existing project **`truemerge`** (`466851852100`). Vertex, Firestore (`nam5`), Cloud Run API, and Secret Manager are already there.
+Default deployment settings:
 
-The tape shows the Cloud Run URL and the Scheduler job — not the old project name. README states this is a reused GCP project, not leftover TrueMerge product code.
+- Project: set with `GCP_PROJECT`
+- Region: `us-central1`
+- Vertex location: `global`
+- Model: `gemini-3.5-flash`
+- Cloud Run service: `kitchenwatch`
+- Scheduler job: `kitchenwatch-watch`
 
-Vertex model: `gemini-3.5-flash` at location `global` (3.5 is not in `us-central1`).
+## Calendar
 
----
+Create a dedicated Google Calendar for the agent output:
 
-## You must do these (I cannot)
-
-### 1. Create a Google Calendar (10 minutes)
-
-Signed into **the same Gmail** you will show on the tape (`123abhishekwasekar@gmail.com`).
-
-1. Open [calendar.google.com](https://calendar.google.com)
+1. Open [calendar.google.com](https://calendar.google.com).
 2. Left side → **Other calendars** → **+** → **Create new calendar**
 3. Name: `KitchenWatch`
-4. Description: `Agent writes use-first meals. Do not add events by hand during the demo.`
+4. Description: `Agent writes use-first meals.`
 5. Create calendar
 6. Settings for that calendar → **Integrate calendar**
 7. Copy **Calendar ID** (looks like `xxxx@group.calendar.google.com`)
-8. Paste it into `kitchenwatch/.env` as `KITCHENWATCH_CALENDAR_ID=...`
-9. Tell me the Calendar ID in chat (or leave it in `.env` and say done)
+8. Put it in `.env` locally as `KITCHENWATCH_CALENDAR_ID=...`
+9. Store it in Secret Manager for Cloud Run.
 
-Done 2026-08-29: calendar shared with `kitchenwatch-run` as **Make changes and see all event details**. ID is in local `.env` and Secret Manager `kitchenwatch-calendar-id`. Do not commit `.env`.
+Share that calendar with the Cloud Run service account:
 
-### 2. Share that calendar with the Cloud Run service account
+- `kitchenwatch-run@<your-gcp-project-id>.iam.gserviceaccount.com`
+- Permission: **Make changes to events**
 
-Service account is already created:
+Without this share, the service can plan but cannot write Calendar events.
 
-`kitchenwatch-run@truemerge.iam.gserviceaccount.com`
+## Cloud resources
 
-Then:
+Required APIs:
 
-1. Calendar settings → **KitchenWatch** → **Share with specific people**
-2. Add that service account email
-3. Permission: **Make changes to events**
-4. Send (Google may say the user is not a Google account — that is normal for a service account; save anyway)
+- Cloud Run
+- Firestore
+- Vertex AI
+- Secret Manager
+- Cloud Scheduler
+- Google Calendar API
 
-Without this share, the agent cannot write. This is the whole Taskmaster proof.
+Service accounts:
 
-### 3. Budget alert (5 minutes)
+- `kitchenwatch-run` for Cloud Run
+- `kitchenwatch-scheduler` for Scheduler OIDC calls
 
-1. [console.cloud.google.com/billing/budgets](https://console.cloud.google.com/billing/budgets)
-2. Budget name `kitchenwatch-cap`
-3. Project: `truemerge` only (this is the KitchenWatch backend)
-4. Amount: **$20**
-5. Alert at 50% and 90%
-6. Email: your Gmail
+Run service account roles:
 
-### 4. Hackathon $150 credits (if you have not)
+- Vertex AI User
+- Cloud Datastore User
+- Secret Manager Secret Accessor
+- Service Usage Consumer
 
-Devpost Resources tab → credit form. Apply them to this billing account, not a random Qwiklabs project.
+Scheduler service account:
 
-### 5. After we deploy — you film these two tabs
+- Cloud Run Invoker on the `kitchenwatch` service
 
-Leave them open for the tape:
+## Deploy
 
-- Cloud Run service URL ending in `.run.app`
-- Cloud Scheduler job `kitchenwatch-watch` (OIDC, not a public cron)
+```bash
+gcloud run deploy kitchenwatch \
+  --source=. \
+  --project=$GCP_PROJECT \
+  --region=us-central1 \
+  --service-account=kitchenwatch-run@$GCP_PROJECT.iam.gserviceaccount.com \
+  --set-env-vars=GCP_PROJECT=$GCP_PROJECT,GCP_LOCATION=global,GEMINI_MODEL=gemini-3.5-flash,GEMINI_USE_VERTEX=1,KITCHEN_ID=demo,KITCHENWATCH_TZ=Asia/Kolkata \
+  --set-secrets=KITCHENWATCH_CALENDAR_ID=kitchenwatch-calendar-id:latest,WATCH_CRON_SECRET=kitchenwatch-cron-secret:latest \
+  --allow-unauthenticated \
+  --min-instances=0 \
+  --max-instances=2 \
+  --memory=1Gi \
+  --cpu=1 \
+  --timeout=180
+```
 
----
+## Runtime notes
 
-## Already done on `truemerge`
+- Do not commit `.env`.
+- Use Secret Manager for calendar id and cron secret.
+- Keep Cloud Run min instances at 0 for low cost.
+- `/cron/watch` is secret-gated and intended for Scheduler.
+- Calendar access uses Cloud Run service account identity, not a JSON key.
 
-- Cloud Scheduler API + Calendar API enabled
-- Service accounts `kitchenwatch-run` and `kitchenwatch-scheduler`
-- Run SA roles: Vertex (`aiplatform.user`), Firestore (`datastore.user`), Secret Manager accessor, `serviceusage.serviceUsageConsumer` (Calendar API consumer)
-- No JSON key on disk
+## Not enabled
 
-Deployed 2026-08-29:
-
-- Cloud Run `kitchenwatch` → https://kitchenwatch-466851852100.us-central1.run.app
-- UI is public (camera + ingest + watch). `/cron/watch` is secret-gated.
-- Secrets: calendar id + cron header
-- Scheduler `kitchenwatch-watch` daily 07:00 Asia/Kolkata, OIDC + secret header
-
-I will **not** create a JSON key unless Calendar ADC fails. Prefer Cloud Run’s own identity.
-
----
-
-## What we are not turning on
-
-- Gmail API (that is Google’s own Taskmaster lab)
+- Gmail API
 - App Engine
 - A second Firestore database
-- Vertex in `us-central1` for Gemini 3.5 (it will 404)
-- A new GCP project (quota is full)
+- A JSON service-account key

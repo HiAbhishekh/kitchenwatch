@@ -22,7 +22,7 @@
 
 ## Why two paths
 
-Ingest is multimodal. Watch is Taskmaster. Mixing them into one chat loop is how this becomes Weight Coach and loses the track.
+Ingest is multimodal and user-present. Watch is the autonomous background workflow. Keeping them separate makes the write path easier to reason about and test.
 
 ## Watch graph (production is `run_watch`, not ADK)
 
@@ -57,7 +57,7 @@ Gemini does not get a vote here.
 
 `job_id = watch:{kitchen_id}:{YYYY-MM-DD}`
 
-If a job is already `written` with an `event_id`, Watch returns that event. It does not insert a second one. That is the Cloud Scheduler retry rule from Google’s own long-running-agent webinar.
+If a job is already `written` with an `event_id`, Watch returns that event. It does not insert a second one. This keeps scheduler retries from creating duplicate Calendar events.
 
 ## State
 
@@ -66,7 +66,7 @@ Firestore collections:
 - `kitchens/{kitchen_id}/items/{item_id}` — ledger
 - `kitchens/{kitchen_id}/jobs/{job_id}` — watch results
 
-No Memory Bank. No nine-agent fleet.
+The application keeps only the state it needs for the kitchen ledger and watch results.
 
 ## Writes we allow
 

@@ -4,7 +4,7 @@ from kitchenwatch.extract import accept_extract
 from kitchenwatch.jobs import watch_job_id
 from kitchenwatch.models import InventoryItem, ProposedAction, TrustVerdict
 from kitchenwatch.normalize import canonical_item_id
-from kitchenwatch.trust import judge
+from kitchenwatch.trust import evaluate_trust
 
 __all__ = [
     "InventoryItem",
@@ -12,6 +12,6 @@ __all__ = [
     "TrustVerdict",
     "accept_extract",
     "canonical_item_id",
-    "judge",
+    "evaluate_trust",
     "watch_job_id",
 ]

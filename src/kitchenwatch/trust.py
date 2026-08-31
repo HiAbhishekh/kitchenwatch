@@ -8,7 +8,7 @@ from kitchenwatch.normalize import canonical_item_id
 from kitchenwatch.retrieve import ledger_by_id
 
 
-def judge(
+def evaluate_trust(
     action: ProposedAction,
     inventory: list[InventoryItem],
     *,

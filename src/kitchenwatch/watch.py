@@ -12,7 +12,7 @@ from kitchenwatch.models import JobRecord, ProposedAction
 from kitchenwatch.plan import Planner, vertex_planner
 from kitchenwatch.retrieve import expiring_within
 from kitchenwatch.settings import horizon_days
-from kitchenwatch.trust import judge
+from kitchenwatch.trust import evaluate_trust
 
 WATCH_STEPS = ("retrieve", "plan", "trust", "write", "verify")
 
@@ -49,7 +49,7 @@ def run_watch(
         return job
 
     action = planner(inventory, due, as_of)
-    verdict = judge(
+    verdict = evaluate_trust(
         action,
         inventory,
         as_of=as_of,

@@ -2,8 +2,7 @@
 
 Won't put dinner on your calendar that your fridge cannot feed.
 
-Hackathon: [All Things Agentic](https://allthingsagentichackathon.devpost.com/) — track **Taskmaster**.  
-Greenfield, August 2026. Not a port of Weight Coach, VisionBridge, or TrueMerge.
+Built for autonomous kitchen planning: real shelf state in, verified calendar action out.
 
 ## What it does
 
@@ -18,7 +17,7 @@ Greenfield, August 2026. Not a port of Weight Coach, VisionBridge, or TrueMerge.
 
 Gemini 3.5 Flash (Vertex, `global`) · Google GenAI SDK · Cloud Run · Firestore · Cloud Scheduler · Google Calendar API
 
-GCP project is `truemerge` (account at project quota; this is a reused cloud project, not leftover TrueMerge product code).
+The hosted demo runs on Cloud Run and keeps its runtime settings in Secret Manager.
 
 ## Repo map
 
@@ -26,10 +25,9 @@ GCP project is `truemerge` (account at project quota; this is a reused cloud pro
 src/kitchenwatch/          models, normalize, trust (no LLM)
 tests/                     planted pass / fail / idempotent
 fixtures/                  gold inventory + proposed actions
-docs/architecture.svg      upload this on Devpost
+docs/architecture.svg      system diagram
 docs/ARCHITECTURE.md
 docs/GCP.md
-docs/PLAN.md
 ```
 
 ## Local
@@ -54,15 +52,15 @@ Do not commit `.env`. Calendar ID and cron secret live in Secret Manager.
 ## Cloud Run (already live)
 
 ```bash
-gcloud run deploy kitchenwatch --source=. --project=truemerge --region=us-central1
+gcloud run deploy kitchenwatch --source=. --project=$GCP_PROJECT --region=us-central1
 ```
 
 Hosted: https://kitchenwatch-466851852100.us-central1.run.app/
 
-## Judge route
+## Demo
 
-Read `JUDGING.md`. Film with `VIDEO.md`. Upload `docs/architecture.svg`.
+Use `DEMO_SCRIPT.md` for a short walkthrough of the hosted app, Calendar write, and Cloud Run/Scheduler deployment.
 
 ## Status
 
-Submit **Taskmaster**. Deadline on Devpost is **31 Aug 2026 5:00 PM PT**.
+Live on Cloud Run. The demo kitchen is `demo`.

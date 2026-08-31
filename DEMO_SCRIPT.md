@@ -9,7 +9,7 @@ Open before recording:
 - Google Cloud Console: Cloud Run service + Cloud Scheduler job `kitchenwatch-watch`
 - Optional: Firestore `kitchens/demo/items`
 
-Do not open `.env`. Do not click a chat composer. Submit to **Taskmaster**.
+Do not open `.env` while recording.
 
 ## 0:00-0:20 — Hook
 

@@ -19,7 +19,7 @@ def load_env(path: Path = ENV_PATH) -> None:
 
 
 def gcp_project() -> str:
-    return os.environ.get("GCP_PROJECT", "truemerge")
+    return os.environ.get("GCP_PROJECT", "kitchenwatch-demo")
 
 
 def gcp_location() -> str:
@@ -45,7 +45,7 @@ def calendar_timezone() -> str:
 def run_sa_email() -> str:
     return os.environ.get(
         "KITCHENWATCH_RUN_SA",
-        "kitchenwatch-run@truemerge.iam.gserviceaccount.com",
+        f"kitchenwatch-run@{gcp_project()}.iam.gserviceaccount.com",
     )
 
 
